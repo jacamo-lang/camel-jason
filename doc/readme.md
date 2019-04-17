@@ -8,17 +8,17 @@ When a component should receive data, it uses a Consumer, that consumes the data
 The Jason Component gives MAS agents the perception of other services as other agents, and the ability to contact them by simply sending a message, with `.send` in JaCaMo.  
 The following image better represents the stated:
 
-![Communication Flow](./images/CommunicationFlow.pdf?raw=true)
+![Communication Flow](images/CommunicationFlow.pdf?raw=true)
 
 ### Table of contents
 1. [Getting Started](#getting-started)
   * [Prerequisites](#prerequisites)
   * [How to use](#how-to-use)
-  * [Defining a context route](#defining-a-context route)
+  * [Defining a context route](#defining-a-context-route)
   * [Using custom context configuration](#using-custom-context-configuration)
 2. [Notes](#notes)
 3. [Examples](#examples)
-  * [Agent-only (main)](#agent-only-(main))
+  * [Agent-only 'main'](#agent-only-'main')
   * [PostgreSQL](#postgresql)
   * [MQTT](#mqtt)
 
