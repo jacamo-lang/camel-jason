@@ -29,24 +29,20 @@ The following image better represents the stated:
 
 
 ### How to use
-1. Download the .jar file and put it in your project's `lib` folder. E.g. `/myProject/lib`.
-
-2. Create a basic gradle build file and add the code below to it, or use the `buildSample.gradle` file and rename it to `build.gradle`.
+1. Create a basic gradle build file and add the code below to it, or use the `buildSample.gradle` file and rename it to `build.gradle`.
 
 ```
 repositories {
-    mavenCentral()
+   mavenCentral()
 
-    maven { url "http://jacamo.sourceforge.net/maven2" }
-    maven { url "http://jade.tilab.com/maven/" }
-
-    flatDir {
-       dirs 'lib'
-    }
+   maven { url "https://raw.github.com/jacamo-lang/mvn-repo/master" }
+   maven { url "http://jacamo.sourceforge.net/maven2" }
 }
 
 dependencies {
-  compile 'org.jacamo:jacamo:0.7'
+  compile 'org.jacamo:jacamo:0.8'
+
+  compile group: 'org.jacamo-lang',     name: 'camel-jason' ,   version: '1.0'
 
   compile group: 'org.apache.camel', name: 'camel-core', version: '2.22.1'
 
@@ -55,13 +51,11 @@ dependencies {
   compile group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.25'
 
   compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
-
-  compile fileTree(dir: 'lib', include: ['*.jar'])
 }
 ```
 
 
-3. Add the dependencies of the components you wish to integrate. Google "maven *mycomponent*", the first link should be from [this website](https://mvnrepository.com/), usually you would want the latest version, and go in the "gradle" tab, simply copy an paste in your build file. For instance, if you want to use mySQL you would add:
+2. Add the dependencies of the components you wish to integrate. Google "maven *mycomponent*", the first link should be from [this website](https://mvnrepository.com/), usually you would want the latest version, and go in the "gradle" tab, simply copy an paste in your build file. For instance, if you want to use mySQL you would add:
 
 ```
 // https://mvnrepository.com/artifact/mysql/mysql-connector-java
@@ -70,18 +64,18 @@ compile group: 'mysql', name: 'mysql-connector-java', version: '8.0.13'
 
 **NOTE** For JDK9+ users, see [Notes Section](##notes).
 
-4. Create each of your contexts in separated `.xml` files and define only the routes within them. The files should maintain the following format:
+3. Create each of your contexts in separated `.xml` files and define only the routes within them. The files should maintain the following format:
 
 ```
 <!-- This first header is mandatory -->
 <routes xmlns="http://camel.apache.org/schema/spring">
     <route id="yourRouteIdOne">
         <from uri="myComponent:address"/>
-        <to uri="jason:agentBob"/>
+        <to uri="jacamo-agent:agentBob"/>
     </route>
 
     <route id="yourRouteIdTwo">
-        <from uri="jason:myComponentName"/>
+        <from uri="jacamo-agent:myComponentName"/>
         <to uri="myComponent:address"/>
     </route>
 </routes>
@@ -90,13 +84,13 @@ compile group: 'mysql', name: 'mysql-connector-java', version: '8.0.13'
 Each file creates a context, so you can have parellel routes running.
 Check out the *Defining a context route* and *Examples* section for more.
 
-5. Add the following to your `.jcm` project:
+4. Add the following to your `.jcm` project:
 
 ```
 platform: jasonComponent.JasonCamel("routes-file-name.xml")
 ```
 
-6. Run `gradle run` to start you `.jcm` with camel.
+5. Run `gradle run` to start you `.jcm` with camel.
 
 ### Defining a context route
 The context is defined mainly using Camel's simple language for XML.
@@ -108,7 +102,7 @@ Usually, in each route you have a consumer endpoint, denoted by "from", and one 
 The purpose of the producer is to generate messages to Jason agents.
 When defining a producer endpoint you must use the following pattern:
 
-`<to uri=jason:Agent?propertyOne=foo&propertyTwo=bar/>`
+`<to uri=jacamo-agent:Agent?propertyOne=foo&propertyTwo=bar/>`
 
 Where "Agent" is the agent's name (e.g. bob, alice), and "propertyOne" and "propertyTwo" are optional properties you can define to the message.
 
@@ -117,10 +111,10 @@ The purpose of the producer is to receive messages that Jason agents tried to se
 Defining a consumer endpoint is analog, the difference being that the producer URI is the name of the other components' representative agent. I.e. to whom the Jason agents will send the messages.
 
 ```
-<from uri="jason:Address?propertyOne=foo&propertyTwo=bar"/>
+<from uri="jacamo-agent:Address?propertyOne=foo&propertyTwo=bar"/>
 ```
 
-In this situation, Address is receivers name. Usually you just repeat the integrated component's name (e.g. `uri=jason:MQTT`, `uri=jason:REST`, ...)
+In this situation, Address is receivers name. Usually you just repeat the integrated component's name (e.g. `uri=jacamo-agent:MQTT`, `uri=jacamo-agent:REST`, ...)
 
 Also, the producer will **apply** the properties to the message, while the consumer will **filter** messages with certain properties.
 
@@ -132,7 +126,7 @@ Then, you would define a route as follow:
 ```
 <route id="fromPhoneToJomi">
   <from uri="phone:myPhone?propertyOne=ok"/>
-  <to uri="jason:jomi"/>
+  <to uri="jacamo-agent:jomi"/>
 </route>
 ```
 
@@ -144,11 +138,11 @@ Now if you want to order another agent "mateus" to achieve the plan !report("jas
 
 ```
 <route id="fromJomiToMyPhone">
-  <from uri="jason:myPhone?source=jomi"/>
+  <from uri="jacamo-agent:myPhone?source=jomi"/>
   <choice>
     <when>
       <simple>${in.body} contains "jason"</simple>
-      <to uri="jason:mateus?performative=achieve&content=report("jason")"
+      <to uri="jacamo-agent:mateus?performative=achieve&content=report("jason")"
     </when>
   </choice>
 </route>
@@ -160,15 +154,15 @@ And finally put that route in your context:
 <routes xmlns="http://camel.apache.org/schema/spring">
     <route id="fromPhoneToJomi">
       <from uri="phone:myPhone?propertyOne=ok"/>
-      <to uri="jason:jomi"/>
+      <to uri="jacamo-agent:jomi"/>
     </route>
 
     <route id="fromJomiToMyPhone">
-      <from uri="jason:myPhone?source=jomi"/>
+      <from uri="jacamo-agent:myPhone?source=jomi"/>
       <choice>
         <when>
           <simple>${in.body} contains "jason"</simple>
-          <to uri="jason:mateus?performative=achieve&content=report("jason")"
+          <to uri="jacamo-agent:mateus?performative=achieve&content=report("jason")"
         </when>
       </choice>
     </route>
@@ -180,11 +174,11 @@ So in the example above, if the source for "myPhone" can be agents "Jomi" or "Ma
 
 ```
 <route id="fromAgentsToMyPhone">
-  <from uri="jason:myPhone"/>
+  <from uri="jacamo-agent:myPhone"/>
   <choice>
     <when>
       <simple>${exchangeProperty[source]} == "jomi" and ${in.body} contains "jason"</simple>
-      <to uri="jason:mateus?performative=achieve&content=report("jason")"
+      <to uri="jacamo-agent:mateus?performative=achieve&content=report("jason")"
     </when>
     <when>
       <simple>${exchangeProperty[source]} == "maicon"</simple>
@@ -198,12 +192,12 @@ If you try the following, it **WON'T** work:
 
 ```
 <route id="fromJomiToMyPhone">
-  <from uri="jason:myPhone?source=jomi"/>
-  <to uri="jason:mateus?performative=achieve&content=report("jason")"
+  <from uri="jacamo-agent:myPhone?source=jomi"/>
+  <to uri="jacamo-agent:mateus?performative=achieve&content=report("jason")"
 </route>
 
 <route id="fromMaiconToMyPhone">
-  <from uri="jason:myPhone?source=maicon"/>
+  <from uri="jacamo-agent:myPhone?source=maicon"/>
   <.... do a different thing ....>
 </route>
 ```
@@ -337,9 +331,9 @@ Here's an example:
 ```
 <routes xmlns="http://camel.apache.org/schema/spring">
     <route id="loggingRoute">
-      <from uri="jason:myPhone?source=alice"/>
+      <from uri="jacamo-agent:myPhone?source=alice"/>
       <log message="Incoming call from alice!"/>
-      <to uri="jason:bob?content=received(myPhone, alice)"/>
+      <to uri="jacamo-agent:bob?content=received(myPhone, alice)"/>
       <to uri="phone:myPhone"/>
     </route>
 </routes>
@@ -381,7 +375,7 @@ compile group: 'javax.xml', name: 'jaxb-api', version: '2.1'
 * You can visit [this page](http://camel.apache.org/simple.html) for documentation on Camel's Simple language, to better define your routes.
 
 ## Examples
-### Agent-only (main)
+### Agent-only 'main'
 Although this example does not use other camel components, it is good to ilustrate the behaviour of JasonComponent in different situations.
 To use you simply run `gradle run`, the routes are defined in `routeMain.xml` and `routeMain2.xml`.
 In the `.xml` file, you can identify only one Jason Consumer endpoint, and several Jason Producer endpoints. That's to show that you can filter your messages through different properties, like its source, or if it is a reply to another message.
