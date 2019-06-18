@@ -11,26 +11,13 @@ public class CamelAgArch extends AgArch {
 			super.sendMsg(m);
 			return;
 		} catch (ReceiverNotFoundException e) {
-			JasonConsumer adr = null;
-
-			if (JasonConsumer.getConsumers().containsKey(m.getReceiver())) {
-				adr = JasonConsumer.getConsumers().get(m.getReceiver());
-			}
-			
-//			else {
-//				// try ZK
-//				byte[] badr = zkClient.getData().forPath(JCMRest.JaCaMoZKAgNodeId+"/"+m.getReceiver());
-//				if (badr != null)
-//					adr = new String(badr);
-//			}
-			
-			// try by camel to send the message
-			if (adr != null) {
-				adr.receiveMessage(m);
-			} else {
-				throw e;
-			}
+            try {
+    			if (JasonConsumer.getConsumers().containsKey(m.getReceiver())) {
+    				JasonConsumer.getConsumers().get(m.getReceiver()).receiveMessage(m);
+                    return;
+    			}
+            } catch (Exception e2) { }
+			throw e;
 		}
-		
 	}
 }
