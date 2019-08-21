@@ -92,7 +92,7 @@ public class JasonConsumer extends DefaultConsumer {
 				contentLit = Literal.parseLiteral(endpoint.getContent());				
 			}
 			
-//			logger.info("Unifying "+contentLit.toString()+" with "+m.getPropCont().toString());
+			logger.info("Unifying "+contentLit.toString()+" with "+m.getPropCont().toString());
 			if(u.unifies((Term)m.getPropCont(), contentLit)) {
 				for(VarTerm t: u) {
 					exchange.setProperty(t.toString(), u.get(t));
@@ -102,8 +102,7 @@ public class JasonConsumer extends DefaultConsumer {
 				return;
 			}
 		 }
-
-		logger.info("Exchange created for processing: "+exchange);
+//		logger.info("Exchange created for processing: "+exchange);
 		try {
 			getProcessor().process(exchange);
 		} catch (Exception e) {

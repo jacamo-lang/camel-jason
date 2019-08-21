@@ -31,10 +31,6 @@ public class JasonEndpoint extends DefaultEndpoint {
 		super(uri, component);
 		logger.setLevel(Level.INFO);
 	}
-	
-//	public JasonEndpoint(String uri) {
-//		super(uri);
-//	}
 
 	public boolean isSingleton() {
 		return false;
@@ -46,7 +42,7 @@ public class JasonEndpoint extends DefaultEndpoint {
 	}
 	
 	public Exchange createExchange(Message jMessage) {
-		logger.info("Generating exchange object from: " + jMessage);
+//		logger.info("Generating exchange object from: " + jMessage);
 		// DefaultMessage inMessage = new DefaultMessage
 		Exchange result = new DefaultExchange(this);
 		
@@ -65,8 +61,8 @@ public class JasonEndpoint extends DefaultEndpoint {
 		result.setProperty("msgId", jMessage.getMsgId());
 		result.setProperty("inReplyTo", jMessage.getInReplyTo());
 		
-		logger.info("Message's properties: " + result.getProperties());
-		logger.info("Message's body      : " + result.getIn().getBody());
+//		logger.info("Message's properties: " + result.getProperties());
+//		logger.info("Message's body      : " + result.getIn().getBody());
 		return result;
 	}
 
